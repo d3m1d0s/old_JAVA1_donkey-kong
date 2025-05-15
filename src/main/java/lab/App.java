@@ -1,56 +1,48 @@
 package lab;
 
-import javafx.animation.AnimationTimer;
 import javafx.application.Application;
 import javafx.scene.Group;
 import javafx.scene.Scene;
 import javafx.scene.canvas.Canvas;
-import javafx.scene.canvas.GraphicsContext;
 import javafx.stage.Stage;
 import javafx.stage.WindowEvent;
 
-/**
- *  Class <b>App</b> - extends class Application and it is an entry point of the program
- * @author     Java I
- */
 public class App extends Application {
 
 	public static void main(String[] args) {
 		launch(args);
 	}
-	
-	private Canvas canvas;
-	private AnimationTimer timer;
-	
+
+	private GameController gameController;
+
 	@Override
 	public void start(Stage primaryStage) {
 		try {
-			//Construct a main window with a canvas.  
 			Group root = new Group();
-			canvas = new Canvas(800, 400);
+			Canvas canvas = new Canvas(672, 768);
 			root.getChildren().add(canvas);
-			Scene scene = new Scene(root, 800, 400);
+			Scene scene = new Scene(root, 672, 768);
+
+			// Инициализация GameController
+			gameController = new GameController(canvas);
+			gameController.initializeControlHandlers(scene); // Установка обработчиков управления
+
 			scene.getStylesheets().add(getClass().getResource("application.css").toExternalForm());
 			primaryStage.setScene(scene);
-			primaryStage.resizableProperty().set(false);
-			primaryStage.setTitle("Java 1 - 1th laboratory");
-			primaryStage.show();
-			
-			//Exit program when main window is closed
+			primaryStage.setTitle("Donkey Kong");
+			primaryStage.setResizable(false);
 			primaryStage.setOnCloseRequest(this::exitProgram);
-			timer = new DrawingThread(canvas);
-			timer.start();
+			primaryStage.show();
+
+			// Запуск игры
+			gameController.startGame();
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
 	}
-	@Override
-	public void stop() throws Exception {
-		timer.stop();
-		super.stop();
-	}
-	
-	private void exitProgram(WindowEvent evt) {
+
+	private void exitProgram(WindowEvent event) {
+		gameController.stopGame(); // Остановка игры при закрытии окна
 		System.exit(0);
 	}
 }
